@@ -1,5 +1,6 @@
 package com.ecodeli.ecodeli_backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -54,11 +55,13 @@ public class Prestataire extends Utilisateur {
 
     @ManyToOne
     @JoinColumn(name = "id_admin_validateur")
+    @JsonIgnore
     private Admin adminValidateur;
 
     @ElementCollection
     @CollectionTable(name = "disponibilites_prestataire",
         joinColumns = @JoinColumn(name = "id_prestataire"))
+    @JsonIgnore
     private Set<LocalDateTime> disponibilites = new HashSet<>();
 
     public enum StatutValidationPrestataire {
