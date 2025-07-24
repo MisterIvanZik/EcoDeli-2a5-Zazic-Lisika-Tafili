@@ -475,16 +475,16 @@ const publierDemande = async () => {
     loading.value = false
     return
   }
-  
+
   // L'ID du JSON correspond déjà aux enum ServiceType
   const getCategorieServiceEnum = (categorie) => {
     console.log('Catégorie sélectionnée:', categorie)
     console.log('ID de la catégorie:', categorie.id)
-    
+
     // L'ID du JSON correspond déjà directement aux enum ServiceType
     const categorieService = categorie.id || 'SERVICES_DOMICILE'
     console.log('CategorieService envoyé au backend:', categorieService)
-    
+
     return categorieService
   }
 
