@@ -450,6 +450,10 @@ const validerFormulaire = () => {
 }
 
 const publierDemande = async () => {
+  console.log('🚀 DEBUT publierDemande()')
+  console.log('📋 categoriesSelectionnees:', categoriesSelectionnees.value)
+  console.log('📊 Nombre de catégories sélectionnées:', categoriesSelectionnees.value.length)
+  
   if (!validerFormulaire()) {
     toast.add({
       severity: 'warn',
@@ -462,8 +466,8 @@ const publierDemande = async () => {
 
   loading.value = true
   
-  console.log('AuthStore user:', authStore.user)
-  console.log('User ID:', authStore.user?.id)
+  console.log('👤 AuthStore user:', authStore.user)
+  console.log('🆔 User ID:', authStore.user?.id)
   
   if (!authStore.user || !authStore.user.id) {
     toast.add({
@@ -475,23 +479,47 @@ const publierDemande = async () => {
     loading.value = false
     return
   }
-
+  
+  // Vérification des catégories sélectionnées
+  if (!categoriesSelectionnees.value || categoriesSelectionnees.value.length === 0) {
+    console.error('❌ ERREUR: Aucune catégorie sélectionnée !')
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: 'Veuillez sélectionner au moins une catégorie',
+      life: 3000
+    })
+    loading.value = false
+    return
+  }
+  
+  console.log('✅ Première catégorie sélectionnée:', categoriesSelectionnees.value[0])
+  
   // L'ID du JSON correspond déjà aux enum ServiceType
   const getCategorieServiceEnum = (categorie) => {
-    console.log('Catégorie sélectionnée:', categorie)
-    console.log('ID de la catégorie:', categorie.id)
-
+    console.log('🎯 getCategorieServiceEnum - Catégorie reçue:', categorie)
+    console.log('🏷️ ID de la catégorie:', categorie?.id)
+    console.log('📝 Type de l\'ID:', typeof categorie?.id)
+    
+    if (!categorie || !categorie.id) {
+      console.error('❌ Catégorie invalide ou ID manquant')
+      return 'SERVICES_DOMICILE'
+    }
+    
     // L'ID du JSON correspond déjà directement aux enum ServiceType
-    const categorieService = categorie.id || 'SERVICES_DOMICILE'
-    console.log('CategorieService envoyé au backend:', categorieService)
-
+    const categorieService = categorie.id
+    console.log('📤 CategorieService final envoyé au backend:', categorieService)
+    
     return categorieService
   }
+
+  const categorieService = getCategorieServiceEnum(categoriesSelectionnees.value[0])
+  console.log('🎯 Catégorie service finale:', categorieService)
 
   const demandeData = {
     titre: formulaire.value.titre,
     description: formulaire.value.description,
-    categorieService: getCategorieServiceEnum(categoriesSelectionnees.value[0]),
+    categorieService: categorieService,
     adresseDepart: formulaire.value.adresseDepart,
     adresseArrivee: formulaire.value.adresseArrivee || null,
     dateSouhaitee: formulaire.value.dateSouhaitee ? formatDateForBackend(formulaire.value.dateSouhaitee) : null,
@@ -500,8 +528,9 @@ const publierDemande = async () => {
     client: { idUtilisateur: authStore.user.id }
   }
 
-  console.log('Données envoyées au backend:', demandeData)
-  console.log('Client object envoyé:', demandeData.client)
+  console.log('📦 Données complètes envoyées au backend:', demandeData)
+  console.log('👤 Client object envoyé:', demandeData.client)
+  console.log('🏷️ CategorieService dans les données:', demandeData.categorieService)
 
   const result = await servicesStore.creerDemandeService(demandeData)
   
