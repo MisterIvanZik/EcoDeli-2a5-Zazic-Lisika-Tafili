@@ -70,8 +70,20 @@ public class DemandeServiceController {
      */
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<DemandeService>> getDemandesServiceByClient(@PathVariable Integer clientId) {
-        List<DemandeService> demandes = demandeServiceService.getDemandesServiceByClient(clientId);
-        return ResponseEntity.ok(demandes);
+        try {
+            System.out.println("🎯 CONTRÔLEUR: Début récupération demandes client " + clientId);
+            
+            List<DemandeService> demandes = demandeServiceService.getDemandesServiceByClient(clientId);
+            
+            System.out.println("✅ CONTRÔLEUR: Service a retourné " + demandes.size() + " demandes");
+            System.out.println("🔄 CONTRÔLEUR: Tentative de sérialisation JSON...");
+            
+            return ResponseEntity.ok(demandes);
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR CONTRÔLEUR lors de la récupération: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**

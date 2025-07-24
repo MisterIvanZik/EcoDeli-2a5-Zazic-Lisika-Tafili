@@ -88,6 +88,7 @@ public class DemandeService {
 
     @ManyToOne
     @JoinColumn(name = "id_client", nullable = false)
+    @JsonIgnore
     private Client client;
 
     @JsonIgnore
