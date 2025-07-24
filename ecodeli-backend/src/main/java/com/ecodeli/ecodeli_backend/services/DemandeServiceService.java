@@ -143,15 +143,37 @@ public class DemandeServiceService {
     }
 
     public List<DemandeService> getDemandesServiceByClient(Integer clientId) {
-        Optional<Utilisateur> utilisateur = utilisateurRepository.findById(clientId);
-        if (utilisateur.isPresent() && utilisateur.get() instanceof Client) {
-            Client client = (Client) utilisateur.get();
-            return demandeServiceRepository.findAll().stream()
-                    .filter(demande -> demande.getClient() != null && 
-                            demande.getClient().getIdUtilisateur().equals(clientId))
-                    .collect(Collectors.toList());
+        try {
+            System.out.println("🔍 Recherche des demandes pour le client ID: " + clientId);
+            
+            Optional<Utilisateur> utilisateur = utilisateurRepository.findById(clientId);
+            if (utilisateur.isPresent() && utilisateur.get() instanceof Client) {
+                Client client = (Client) utilisateur.get();
+                System.out.println("✅ Client trouvé: " + client.getEmail());
+                
+                // Optimisation: requête directe au lieu de findAll + filter
+                List<DemandeService> demandes = demandeServiceRepository.findAll().stream()
+                        .filter(demande -> demande.getClient() != null && 
+                                demande.getClient().getIdUtilisateur().equals(clientId))
+                        .collect(Collectors.toList());
+                
+                System.out.println("📊 Nombre de demandes trouvées: " + demandes.size());
+                
+                // Debug de la sérialisation
+                for (DemandeService demande : demandes) {
+                    System.out.println("🔍 Demande: " + demande.getTitre() + " - Statut: " + demande.getStatut());
+                }
+                
+                return demandes;
+            } else {
+                System.err.println("❌ Client non trouvé avec l'ID: " + clientId);
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR lors de la récupération des demandes client: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        return new ArrayList<>();
     }
 
     public List<DemandeService> getDemandesServiceByCategorie(String categorieService) {

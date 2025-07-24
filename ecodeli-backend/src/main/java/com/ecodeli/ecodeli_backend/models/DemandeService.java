@@ -69,6 +69,7 @@ public class DemandeService {
     @CollectionTable(name = "demande_service_photos",
                     joinColumns = @JoinColumn(name = "id_demande"))
     @Column(name = "photo_url")
+    @JsonIgnore
     private List<String> photosUrls = new ArrayList<>();
 
     @Column(name = "details_specifiques", columnDefinition = "TEXT")
