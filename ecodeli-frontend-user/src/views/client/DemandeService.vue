@@ -476,17 +476,16 @@ const publierDemande = async () => {
     return
   }
   
-  // Convertir la première catégorie sélectionnée en enum ServiceType
+  // L'ID du JSON correspond déjà aux enum ServiceType
   const getCategorieServiceEnum = (categorie) => {
-    const mapping = {
-      'transport-livraison': 'TRANSPORT_LIVRAISON',
-      'services-domicile': 'SERVICES_DOMICILE', 
-      'travaux-reparations': 'TRAVAUX_REPARATIONS',
-      'courses-achats': 'COURSES_ACHATS',
-      'services-personnels': 'SERVICES_PERSONNELS',
-      'education-formation': 'EDUCATION_FORMATION'
-    }
-    return mapping[categorie.id] || 'SERVICES_DOMICILE'
+    console.log('Catégorie sélectionnée:', categorie)
+    console.log('ID de la catégorie:', categorie.id)
+    
+    // L'ID du JSON correspond déjà directement aux enum ServiceType
+    const categorieService = categorie.id || 'SERVICES_DOMICILE'
+    console.log('CategorieService envoyé au backend:', categorieService)
+    
+    return categorieService
   }
 
   const demandeData = {
