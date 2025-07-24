@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/demandes-service")
@@ -69,16 +70,40 @@ public class DemandeServiceController {
      * Récupérer les demandes de service d'un client
      */
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<DemandeService>> getDemandesServiceByClient(@PathVariable Integer clientId) {
+    public ResponseEntity<List<Map<String, Object>>> getDemandesServiceByClient(@PathVariable Integer clientId) {
         try {
             System.out.println("🎯 CONTRÔLEUR: Début récupération demandes client " + clientId);
             
             List<DemandeService> demandes = demandeServiceService.getDemandesServiceByClient(clientId);
             
             System.out.println("✅ CONTRÔLEUR: Service a retourné " + demandes.size() + " demandes");
-            System.out.println("🔄 CONTRÔLEUR: Tentative de sérialisation JSON...");
+            System.out.println("🔄 CONTRÔLEUR: Conversion en DTO simple...");
             
-            return ResponseEntity.ok(demandes);
+            // Conversion en Map simple pour éviter les problèmes de sérialisation
+            List<Map<String, Object>> demandesDto = demandes.stream().map(demande -> {
+                Map<String, Object> dto = new HashMap<>();
+                dto.put("idDemande", demande.getIdDemande());
+                dto.put("titre", demande.getTitre());
+                dto.put("description", demande.getDescription());
+                dto.put("categorieService", demande.getCategorieService());
+                dto.put("typeServiceSpecifique", demande.getTypeServiceSpecifique());
+                dto.put("servicePersonnalise", demande.getServicePersonnalise());
+                dto.put("adresseDepart", demande.getAdresseDepart());
+                dto.put("adresseArrivee", demande.getAdresseArrivee());
+                dto.put("dateSouhaitee", demande.getDateSouhaitee());
+                dto.put("creneauHoraire", demande.getCreneauHoraire());
+                dto.put("budgetMin", demande.getBudgetMin());
+                dto.put("budgetMax", demande.getBudgetMax());
+                dto.put("detailsSpecifiques", demande.getDetailsSpecifiques());
+                dto.put("statut", demande.getStatut());
+                dto.put("dateCreation", demande.getDateCreation());
+                dto.put("dateModification", demande.getDateModification());
+                return dto;
+            }).collect(Collectors.toList());
+            
+            System.out.println("✅ CONTRÔLEUR: Conversion DTO réussie, retour de " + demandesDto.size() + " éléments");
+            
+            return ResponseEntity.ok(demandesDto);
         } catch (Exception e) {
             System.err.println("❌ ERREUR CONTRÔLEUR lors de la récupération: " + e.getMessage());
             e.printStackTrace();

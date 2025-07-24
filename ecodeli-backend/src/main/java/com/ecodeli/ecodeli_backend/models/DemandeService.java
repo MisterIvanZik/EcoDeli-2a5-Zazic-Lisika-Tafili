@@ -137,12 +137,14 @@ public class DemandeService {
         return statut != StatutDemande.TERMINEE && statut != StatutDemande.ANNULEE;
     }
 
+    @JsonIgnore
     public int getNombreCandidatures() {
         return candidatures != null ? candidatures.size() : 0;
     }
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    @JsonIgnore
     public Map<String, Object> getDetailsSpecifiquesAsMap() {
         if (detailsSpecifiques == null || detailsSpecifiques.trim().isEmpty()) {
             return new HashMap<>();
@@ -166,6 +168,7 @@ public class DemandeService {
         }
     }
 
+    @JsonIgnore
     public boolean hasDetailsSpecifiques() {
         return detailsSpecifiques != null && !detailsSpecifiques.trim().isEmpty();
     }
