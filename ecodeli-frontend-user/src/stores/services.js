@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 export const useServicesStore = defineStore('services', () => {
   const demandesServices = ref([])
@@ -10,23 +11,21 @@ export const useServicesStore = defineStore('services', () => {
 
   const chargerCategories = async () => {
     try {
-      const categoriesFiles = [
-        'transport-livraison',
-        'services-domicile', 
-        'travaux-reparations',
-        'courses-achats',
-        'services-personnels',
-        'education-formation'
-      ]
+      // Import dynamique des fichiers JSON (compatible production)
+      const categoriesData = await Promise.all([
+        import('@/data/service-categories/transport-livraison.json'),
+        import('@/data/service-categories/services-domicile.json'),
+        import('@/data/service-categories/travaux-reparations.json'),
+        import('@/data/service-categories/courses-achats.json'),
+        import('@/data/service-categories/services-personnels.json'),
+        import('@/data/service-categories/education-formation.json')
+      ])
       
-      const categoriesPromises = categoriesFiles.map(async (file) => {
-        const response = await fetch(`/src/data/service-categories/${file}.json`)
-        return await response.json()
-      })
-      
-      categories.value = await Promise.all(categoriesPromises)
+      // Extraire les données par défaut de chaque import
+      categories.value = categoriesData.map(module => module.default)
       return { success: true, data: categories.value }
     } catch (err) {
+      console.error('Erreur chargement catégories:', err)
       error.value = err.message
       return { success: false, error: err.message }
     }
@@ -41,7 +40,7 @@ export const useServicesStore = defineStore('services', () => {
     
     try {
       console.log('Envoi requête POST vers backend...')
-      const response = await axios.post('https://ecodeli-2a5-zazic-lisika-tafili-production.up.railway.app/api/demandes-service', demande)
+      const response = await axios.post(getApiUrl('/api/demandes-service'), demande)
       
       console.log('Réponse reçue:', response.status, response.data)
       
@@ -71,7 +70,7 @@ export const useServicesStore = defineStore('services', () => {
     error.value = null
     
     try {
-      const response = await axios.get(`https://ecodeli-2a5-zazic-lisika-tafili-production.up.railway.app/api/demandes-service/client/${clientId}`)
+      const response = await axios.get(getApiUrl(`/api/demandes-service/client/${clientId}`))
       
       if (response.status === 200) {
         demandesServices.value = response.data
@@ -90,7 +89,7 @@ export const useServicesStore = defineStore('services', () => {
     error.value = null
     
     try {
-      const response = await axios.put(`https://ecodeli-2a5-zazic-lisika-tafili-production.up.railway.app/api/demandes-service/${id}`, donnees)
+      const response = await axios.put(getApiUrl(`/api/demandes-service/${id}`), donnees)
       
       if (response.status === 200) {
         const index = demandesServices.value.findIndex(d => d.idDemande === id)
@@ -112,7 +111,7 @@ export const useServicesStore = defineStore('services', () => {
     error.value = null
     
     try {
-      const response = await axios.delete(`https://ecodeli-2a5-zazic-lisika-tafili-production.up.railway.app/api/demandes-service/${id}`)
+      const response = await axios.delete(getApiUrl(`/api/demandes-service/${id}`))
       
       if (response.status === 200) {
         const index = demandesServices.value.findIndex(d => d.idDemande === id)
@@ -135,7 +134,7 @@ export const useServicesStore = defineStore('services', () => {
     error.value = null
 
     try {
-      const response = await axios.get(`https://ecodeli-2a5-zazic-lisika-tafili-production.up.railway.app/api/demandes-service/${demandeId}`)
+      const response = await axios.get(getApiUrl(`/api/demandes-service/${demandeId}`))
       
       console.log('Demande récupérée:', response.data)
       
