@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -38,7 +39,7 @@ onMounted(async () => {
 const loadPortefeuille = async () => {
   loading.value = true
   try {
-    const response = await axios.get(`http://localhost:8080/api/portefeuille/livreur/${authStore.user.idUtilisateur}`)
+    const response = await axios.get(getApiUrl(`/api/portefeuille/livreur/${authStore.user.idUtilisateur}`))
 
     if (response.data.success) {
       portefeuille.value = response.data
@@ -61,7 +62,7 @@ const loadPortefeuille = async () => {
 
 const loadHistoriqueRetraits = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/portefeuille/retraits/${authStore.user.idUtilisateur}`)
+    const response = await axios.get(getApiUrl(`/api/portefeuille/retraits/${authStore.user.idUtilisateur}`))
 
     if (response.data.success) {
       retraits.value = response.data.retraits
@@ -82,7 +83,7 @@ const processWithdraw = async () => {
 
   withdrawing.value = true
   try {
-    const response = await axios.post(`http://localhost:8080/api/portefeuille/retrait/${authStore.user.idUtilisateur}`, {
+    const response = await axios.post(getApiUrl(`/api/portefeuille/retrait/${authStore.user.idUtilisateur}`), {
       montant: withdrawForm.value.montant,
       iban: withdrawForm.value.iban
     })

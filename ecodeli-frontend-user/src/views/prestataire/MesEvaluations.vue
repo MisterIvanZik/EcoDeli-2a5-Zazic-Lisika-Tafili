@@ -314,6 +314,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import EvaluationStars from '@/components/EvaluationStars.vue'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -409,16 +410,16 @@ const chargerEvaluations = async () => {
       return
     }
     
-    const statsResponse = await axios.get(`http://localhost:8080/api/missions/prestataire/${prestataireId}/evaluations/stats`)
+    const statsResponse = await axios.get(getApiUrl(`/api/missions/prestataire/${prestataireId}/evaluations/stats`))
     if (statsResponse.data) {
       statistiques.value = statsResponse.data
     }
     
     let evaluationsResponse
     if (showAll.value) {
-      evaluationsResponse = await axios.get(`http://localhost:8080/api/missions/prestataire/${prestataireId}/evaluations`)
+      evaluationsResponse = await axios.get(getApiUrl(`/api/missions/prestataire/${prestataireId}/evaluations`))
     } else {
-      evaluationsResponse = await axios.get(`http://localhost:8080/api/missions/prestataire/${prestataireId}/evaluations/commentaires?limit=10`)
+      evaluationsResponse = await axios.get(getApiUrl(`/api/missions/prestataire/${prestataireId}/evaluations/commentaires?limit=10`))
     }
     
     if (evaluationsResponse.data) {

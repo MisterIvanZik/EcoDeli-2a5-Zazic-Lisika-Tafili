@@ -259,6 +259,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -354,7 +355,7 @@ const chargerPortefeuille = async () => {
       console.warn('Utilisation ID prestataire de développement')
     }
     
-    const response = await axios.get(`http://localhost:8080/api/paiement/portefeuille/prestataire/${prestataireId.value}`)
+    const response = await axios.get(getApiUrl(`/api/paiement/portefeuille/prestataire/${prestataireId.value}`))
     
     if (response.data) {
       portefeuille.value = response.data
@@ -382,7 +383,7 @@ const chargerTransactions = async () => {
   
   try {
     const limit = showAllTransactions.value ? 100 : 20
-    const response = await axios.get(`http://localhost:8080/api/paiement/portefeuille/prestataire/${prestataireId.value}/transactions?limit=${limit}`)
+    const response = await axios.get(getApiUrl(`/api/paiement/portefeuille/prestataire/${prestataireId.value}/transactions?limit=${limit}`))
     
     if (response.data) {
       transactions.value = response.data
@@ -424,7 +425,7 @@ const executerRetrait = async () => {
       iban: retraitForm.value.iban
     }
     
-    const response = await axios.post(`http://localhost:8080/api/paiement/portefeuille/prestataire/${prestataireId.value}/retrait`, retraitData)
+    const response = await axios.post(getApiUrl(`/api/paiement/portefeuille/prestataire/${prestataireId.value}/retrait`), retraitData)
     
     if (response.data.success) {
       toast.add({

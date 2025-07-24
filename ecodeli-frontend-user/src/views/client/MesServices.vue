@@ -330,6 +330,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -421,8 +422,8 @@ const chargerServices = async () => {
       router.push('/login')
       return
     }
-    
-    const response = await axios.get(`http://localhost:8080/api/missions/client/${clientId}`)
+
+    const response = await axios.get(getApiUrl(`/api/missions/client/${clientId}`))
     
     if (response.data) {
       services.value = response.data.map(mission => ({

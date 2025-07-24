@@ -6,6 +6,7 @@ import { useAnnoncesStore } from '@/stores/annonces'
 import { useCandidaturesStore } from '@/stores/candidatures'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
+import { getApiUrl } from '@/config/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -286,8 +287,8 @@ const loadTotalServicesDepenses = async () => {
       console.warn('ID utilisateur non trouvé pour le calcul des dépenses services')
       return
     }
-    
-    const response = await fetch(`http://localhost:8080/api/paiement/client/${clientId}/total-depense`)
+
+    const response = await fetch(getApiUrl(`/api/paiement/client/${clientId}/total-depense`))
     
     if (response.ok) {
       const data = await response.json()

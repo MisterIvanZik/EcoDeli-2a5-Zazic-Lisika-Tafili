@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { loadStripe } from '@stripe/stripe-js'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -41,7 +42,7 @@ onMounted(async () => {
 
 const initStripe = async () => {
   try {
-    const configResponse = await axios.get('http://localhost:8080/api/payment/config')
+    const configResponse = await axios.get(getApiUrl('/api/payment/config'))
     const publishableKey = configResponse.data.publishableKey
 
     stripe.value = await loadStripe(publishableKey)
@@ -81,7 +82,7 @@ const loadAnnonce = async () => {
   loading.value = true
   try {
     const annonceId = route.params.annonceId
-    const response = await axios.get(`http://localhost:8080/api/annonces/${annonceId}`)
+    const response = await axios.get(getApiUrl(`/api/annonces/${annonceId}`))
     annonce.value = response.data
   } catch (error) {
     console.error('Erreur lors du chargement de l\'annonce:', error)
@@ -94,7 +95,7 @@ const loadAnnonce = async () => {
 const createPaymentIntent = async () => {
   try {
     const annonceId = route.params.annonceId
-    const response = await axios.post(`http://localhost:8080/api/payment/create-intent/${annonceId}`)
+    const response = await axios.post(getApiUrl(`/api/payment/create-intent/${annonceId}`))
 
     if (response.data.success) {
       clientSecret.value = response.data.clientSecret
@@ -136,7 +137,7 @@ const handlePayment = async () => {
     }
 
     if (paymentIntent.status === 'succeeded') {
-      const confirmResponse = await axios.post(`http://localhost:8080/api/payment/confirm/${route.params.annonceId}`, {
+      const confirmResponse = await axios.post(getApiUrl(`/api/payment/confirm/${route.params.annonceId}`), {
         paymentIntentId: paymentIntentId.value,
         ibanClient: ibanClient.value
       })

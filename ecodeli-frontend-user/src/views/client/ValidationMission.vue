@@ -365,6 +365,7 @@ import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import EvaluationStars from '@/components/EvaluationStars.vue'
 import axios from 'axios'
+import { getApiUrl } from '@/config/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -436,13 +437,13 @@ const chargerMission = async () => {
   loading.value = true
   
   try {
-    const missionResponse = await axios.get(`http://localhost:8080/api/missions/${missionId.value}`)
+    const missionResponse = await axios.get(getApiUrl(`/api/missions/${missionId.value}`))
     if (missionResponse.data) {
       mission.value = missionResponse.data
     }
     
     try {
-      const evaluationResponse = await axios.get(`http://localhost:8080/api/missions/${missionId.value}/evaluation`)
+      const evaluationResponse = await axios.get(getApiUrl(`/api/missions/${missionId.value}/evaluation`))
       if (evaluationResponse.data) {
         evaluationExistante.value = evaluationResponse.data
       }
@@ -482,7 +483,7 @@ const validerEvaluation = () => {
 
 const obtenirPrixReel = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/missions/${missionId.value}/prix-calcule`)
+    const response = await axios.get(getApiUrl(`/api/missions/${missionId.value}/prix-calcule`))
     
     if (response.data && response.data.prixTotal) {
       console.log('Prix réel récupéré:', response.data.prixTotal, '€')
@@ -538,7 +539,7 @@ const executerValidation = async () => {
       commentaire: evaluation.value.commentaire
     }
     
-    const response = await axios.post(`http://localhost:8080/api/missions/${missionId.value}/evaluation`, evaluationData)
+    const response = await axios.post(getApiUrl(`/api/missions/${missionId.value}/evaluation`), evaluationData)
     
     if (response.data.success) {
       let toastMessage = 'Votre évaluation a été enregistrée avec succès'
