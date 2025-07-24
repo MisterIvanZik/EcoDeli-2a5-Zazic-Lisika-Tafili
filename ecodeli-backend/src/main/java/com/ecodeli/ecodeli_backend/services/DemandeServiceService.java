@@ -64,15 +64,20 @@ public class DemandeServiceService {
             }
         }
         
-        @SuppressWarnings("unchecked")
-        List<String> categories = (List<String>) demandeData.get("categoriesService");
-        if (categories != null && !categories.isEmpty()) {
+        // Le frontend envoie "categorieService" (singulier) directement
+        if (demandeData.get("categorieService") != null) {
             try {
-                ServiceType serviceType = ServiceType.valueOf(categories.get(0));
+                String categorieServiceStr = (String) demandeData.get("categorieService");
+                ServiceType serviceType = ServiceType.valueOf(categorieServiceStr);
                 demande.setCategorieService(serviceType);
+                System.out.println("✅ CategorieService mappé: " + serviceType);
             } catch (IllegalArgumentException e) {
+                System.err.println("❌ Erreur mapping categorieService: " + demandeData.get("categorieService"));
                 demande.setCategorieService(ServiceType.SERVICES_DOMICILE);
             }
+        } else {
+            System.err.println("❌ categorieService non trouvé dans les données");
+            System.err.println("Clés disponibles: " + demandeData.keySet());
         }
         
         @SuppressWarnings("unchecked")
