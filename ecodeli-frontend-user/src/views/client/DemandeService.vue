@@ -476,15 +476,28 @@ const publierDemande = async () => {
     return
   }
   
+  // Convertir la première catégorie sélectionnée en enum ServiceType
+  const getCategorieServiceEnum = (categorie) => {
+    const mapping = {
+      'transport-livraison': 'TRANSPORT_LIVRAISON',
+      'services-domicile': 'SERVICES_DOMICILE', 
+      'travaux-reparations': 'TRAVAUX_REPARATIONS',
+      'courses-achats': 'COURSES_ACHATS',
+      'services-personnels': 'SERVICES_PERSONNELS',
+      'education-formation': 'EDUCATION_FORMATION'
+    }
+    return mapping[categorie.id] || 'SERVICES_DOMICILE'
+  }
+
   const demandeData = {
     titre: formulaire.value.titre,
     description: formulaire.value.description,
+    categorieService: getCategorieServiceEnum(categoriesSelectionnees.value[0]),
     adresseDepart: formulaire.value.adresseDepart,
     adresseArrivee: formulaire.value.adresseArrivee || null,
     dateSouhaitee: formulaire.value.dateSouhaitee ? formatDateForBackend(formulaire.value.dateSouhaitee) : null,
     creneauHoraire: formulaire.value.creneauHoraire || null,
     detailsSpecifiques: formulaire.value.detailsSpecifiques || {},
-    categoriesService: categoriesSelectionnees.value.map(cat => cat.backendId || cat.id),
     client: { idUtilisateur: authStore.user.id }
   }
 
