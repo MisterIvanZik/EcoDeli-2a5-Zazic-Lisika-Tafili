@@ -71,7 +71,7 @@ public class DemandeService {
     @Column(name = "photo_url")
     private List<String> photosUrls = new ArrayList<>();
 
-    @Column(name = "details_specifiques", columnDefinition = "JSON")
+    @Column(name = "details_specifiques", columnDefinition = "TEXT")
     private String detailsSpecifiques;
 
     @NotNull(message = "Le statut est obligatoire")
