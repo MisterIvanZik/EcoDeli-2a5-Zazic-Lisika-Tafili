@@ -55,9 +55,9 @@ public interface DemandeServiceRepository extends JpaRepository<DemandeService, 
      */
     @Query("SELECT d FROM DemandeService d WHERE d.categorieService = :categorie " +
            "AND d.statut = 'PUBLIEE' " +
-           "AND (:search IS NULL OR LOWER(d.titre) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "     OR LOWER(d.description) LIKE LOWER(CONCAT('%', :search, '%'))) " +
-           "AND (:localisation IS NULL OR LOWER(d.adresseDepart) LIKE LOWER(CONCAT('%', :localisation, '%'))) " +
+           "AND (:search IS NULL OR d.titre LIKE CONCAT('%', :search, '%') " +
+           "     OR d.description LIKE CONCAT('%', :search, '%')) " +
+           "AND (:localisation IS NULL OR d.adresseDepart LIKE CONCAT('%', :localisation, '%')) " +
            "ORDER BY d.dateCreation DESC")
     Page<DemandeService> findPublishedByCategorieWithFilters(
         @Param("categorie") ServiceType categorie,

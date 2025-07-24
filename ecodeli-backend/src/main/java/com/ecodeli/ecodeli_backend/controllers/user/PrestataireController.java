@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/prestataire")
@@ -247,7 +248,7 @@ public class PrestataireController {
     }
 
     @GetMapping("/demandes-disponibles/paginated")
-    public ResponseEntity<Page<DemandeService>> getDemandesPaginated(
+    public ResponseEntity<Map<String, Object>> getDemandesPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String search,
@@ -256,11 +257,52 @@ public class PrestataireController {
             @RequestParam(required = false) String localisation,
             Authentication authentication) {
         try {
+            System.out.println("🎯 PRESTATAIRE: Début récupération demandes paginées");
+            
             Integer prestataireId = getPrestataireId(authentication);
             Page<DemandeService> demandes = prestataireService.getDemandesPaginated(
                 prestataireId, page, size, search, dateMin, dateMax, localisation);
-            return ResponseEntity.ok(demandes);
+            
+            System.out.println("✅ PRESTATAIRE: Service a retourné " + demandes.getContent().size() + " demandes");
+            System.out.println("🔄 PRESTATAIRE: Conversion en DTO simple...");
+            
+            // Conversion en DTO simple pour éviter les problèmes de sérialisation
+            List<Map<String, Object>> demandesDto = demandes.getContent().stream().map(demande -> {
+                Map<String, Object> dto = new HashMap<>();
+                dto.put("idDemande", demande.getIdDemande());
+                dto.put("titre", demande.getTitre());
+                dto.put("description", demande.getDescription());
+                dto.put("categorieService", demande.getCategorieService());
+                dto.put("typeServiceSpecifique", demande.getTypeServiceSpecifique());
+                dto.put("servicePersonnalise", demande.getServicePersonnalise());
+                dto.put("adresseDepart", demande.getAdresseDepart());
+                dto.put("adresseArrivee", demande.getAdresseArrivee());
+                dto.put("dateSouhaitee", demande.getDateSouhaitee());
+                dto.put("creneauHoraire", demande.getCreneauHoraire());
+                dto.put("budgetMin", demande.getBudgetMin());
+                dto.put("budgetMax", demande.getBudgetMax());
+                dto.put("detailsSpecifiques", demande.getDetailsSpecifiques());
+                dto.put("statut", demande.getStatut());
+                dto.put("dateCreation", demande.getDateCreation());
+                dto.put("dateModification", demande.getDateModification());
+                return dto;
+            }).collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", demandesDto);
+            response.put("totalElements", demandes.getTotalElements());
+            response.put("totalPages", demandes.getTotalPages());
+            response.put("size", demandes.getSize());
+            response.put("number", demandes.getNumber());
+            response.put("first", demandes.isFirst());
+            response.put("last", demandes.isLast());
+            
+            System.out.println("✅ PRESTATAIRE: Conversion DTO réussie, retour de " + demandesDto.size() + " éléments");
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("❌ ERREUR PRESTATAIRE lors de la récupération: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
