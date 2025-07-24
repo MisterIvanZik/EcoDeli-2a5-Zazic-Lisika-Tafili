@@ -40,6 +40,21 @@ onMounted(async () => {
   }
 })
 
+// Watcher pour monter Stripe Card Element après chargement annonce et affichage DOM
+import { watch } from 'vue'
+watch(annonce, async (val) => {
+  if (val) {
+    await nextTick()
+    const cardContainer = document.getElementById('card-element')
+    if (cardContainer && cardElement.value) {
+      cardElement.value.mount('#card-element')
+      console.log('Stripe Card Element monté (watcher):', cardElement.value)
+    } else {
+      console.error('Card Element non monté (watcher), cardContainer:', cardContainer, 'cardElement:', cardElement.value)
+    }
+  }
+})
+
 const initStripe = async () => {
   try {
     const configResponse = await axios.get(getApiUrl('/api/payment/config'))
@@ -65,15 +80,7 @@ const initStripe = async () => {
       },
     })
 
-    // Utilisation de nextTick pour garantir que le DOM est prêt
-    await nextTick()
-    const cardContainer = document.getElementById('card-element')
-    if (cardContainer && cardElement.value) {
-      cardElement.value.mount('#card-element')
-      console.log('Stripe Card Element monté:', cardElement.value)
-    } else {
-      console.error('Card Element non monté, cardContainer:', cardContainer, 'cardElement:', cardElement.value)
-    }
+    // Le montage Stripe Card Element est maintenant fait dans le watcher sur annonce
 
   } catch (error) {
     console.error('Erreur Stripe:', error)
