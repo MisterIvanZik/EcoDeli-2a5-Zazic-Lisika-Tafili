@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { loadStripe } from '@stripe/stripe-js'
 import { useToast } from 'primevue/usetoast'
@@ -65,12 +65,15 @@ const initStripe = async () => {
       },
     })
 
-    setTimeout(() => {
-      const cardContainer = document.getElementById('card-element')
-      if (cardContainer) {
-        cardElement.value.mount('#card-element')
-      }
-    }, 100)
+    // Utilisation de nextTick pour garantir que le DOM est prêt
+    await nextTick()
+    const cardContainer = document.getElementById('card-element')
+    if (cardContainer && cardElement.value) {
+      cardElement.value.mount('#card-element')
+      console.log('Stripe Card Element monté:', cardElement.value)
+    } else {
+      console.error('Card Element non monté, cardContainer:', cardContainer, 'cardElement:', cardElement.value)
+    }
 
   } catch (error) {
     console.error('Erreur Stripe:', error)
@@ -121,6 +124,18 @@ const handlePayment = async () => {
   }
 
   paymentProcessing.value = true
+
+  // Vérification Card Element monté
+  if (!cardElement.value || !document.getElementById('card-element')) {
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur paiement',
+      detail: 'Le champ carte bancaire n\'est pas prêt. Recharge la page ou réessaie.',
+      life: 4000
+    })
+    paymentProcessing.value = false
+    return
+  }
 
   try {
     const { error, paymentIntent } = await stripe.value.confirmCardPayment(clientSecret.value, {
