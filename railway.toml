@@ -14,7 +14,7 @@ startCommand = "java -jar app.jar"
 
 # Variables à ajouter manuellement via l'interface Railway :
 # JWT_SECRET=votre_jwt_secret_securise
-# MAIL_USERNAME=votre_email@gmail.com  
+# MAIL_USERNAME=votre_email@gmail.com
 # MAIL_PASSWORD=votre_mot_de_passe_application
 # STRIPE_PUBLISHABLE_KEY=pk_test_...
 # STRIPE_SECRET_KEY=sk_test_...
