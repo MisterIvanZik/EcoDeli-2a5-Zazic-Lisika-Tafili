@@ -197,7 +197,16 @@ public class ContratService {
     }
 
     public List<ContratCommercant> getAllContrats() {
-        return contratRepository.findAllByOrderByDateDemandeDesc();
+        try {
+            System.out.println("🔍 CONTRAT SERVICE: Appel repository findAllByOrderByDateDemandeDesc");
+            List<ContratCommercant> contrats = contratRepository.findAllByOrderByDateDemandeDesc();
+            System.out.println("✅ CONTRAT SERVICE: Repository a retourné " + contrats.size() + " contrats");
+            return contrats;
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR CONTRAT SERVICE getAllContrats: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
     
     public List<ContratCommercant> getContratsByStatut(StatutContrat statut) {

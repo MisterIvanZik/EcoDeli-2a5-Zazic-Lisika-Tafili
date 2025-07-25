@@ -25,25 +25,42 @@ public class AdminContratController {
     @GetMapping
     public ResponseEntity<?> getAllContrats(@RequestParam(required = false) String statut) {
         try {
+            System.out.println("🎯 ADMIN CONTRATS: Début récupération contrats avec statut: " + statut);
+            
             List<ContratCommercant> contrats;
 
             if (statut != null && !statut.isEmpty()) {
                 try {
                     StatutContrat statutEnum = StatutContrat.valueOf(statut.toUpperCase());
+                    System.out.println("✅ ADMIN CONTRATS: Récupération par statut: " + statutEnum);
                     contrats = contratService.getContratsByStatut(statutEnum);
                 } catch (IllegalArgumentException e) {
+                    System.err.println("❌ ADMIN CONTRATS: Statut invalide: " + statut);
                     return ResponseEntity.badRequest().body(Map.of(
                         "success", false,
                         "error", "Statut invalide: " + statut
                     ));
                 }
             } else {
+                System.out.println("✅ ADMIN CONTRATS: Récupération de tous les contrats");
                 contrats = contratService.getAllContrats();
             }
 
+            System.out.println("✅ ADMIN CONTRATS: Service a retourné " + contrats.size() + " contrats");
+            System.out.println("🔄 ADMIN CONTRATS: Formatage des contrats...");
+
             List<Map<String, Object>> contratsFormatted = contrats.stream()
-                .map(this::formatContratForAdmin)
+                .map(contrat -> {
+                    try {
+                        return formatContratForAdmin(contrat);
+                    } catch (Exception e) {
+                        System.err.println("❌ ADMIN CONTRATS: Erreur formatage contrat " + contrat.getIdContrat() + ": " + e.getMessage());
+                        throw e;
+                    }
+                })
                 .collect(Collectors.toList());
+
+            System.out.println("✅ ADMIN CONTRATS: Formatage réussi, retour de " + contratsFormatted.size() + " contrats");
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
@@ -51,6 +68,8 @@ public class AdminContratController {
             ));
 
         } catch (Exception e) {
+            System.err.println("❌ ERREUR ADMIN CONTRATS: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                 "success", false,
                 "error", "Erreur lors de la récupération des contrats: " + e.getMessage()
