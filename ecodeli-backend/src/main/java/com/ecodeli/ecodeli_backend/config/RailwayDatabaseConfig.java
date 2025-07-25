@@ -53,12 +53,13 @@ public class RailwayDatabaseConfig {
                 // Fallback vers l'URL originale avec préfixe jdbc:
                 properties.setUrl("jdbc:" + databaseUrl);
             }
-        } else {
-            // Développement local
-            properties.setUrl("jdbc:postgresql://localhost:5432/ecodeli");
-            properties.setUsername("ecodeli");
-            properties.setPassword("password");
         }
+        //  else {
+        //     // Développement local
+        //     properties.setUrl("jdbc:postgresql://localhost:5432/ecodeli");
+        //     properties.setUsername("ecodeli");
+        //     properties.setPassword("password");
+        // }
         
         return properties;
     }
