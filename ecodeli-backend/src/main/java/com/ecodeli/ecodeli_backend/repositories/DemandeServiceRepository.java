@@ -51,17 +51,10 @@ public interface DemandeServiceRepository extends JpaRepository<DemandeService, 
     List<Object[]> countByStatut();
 
     /**
-     * Récupérer les demandes publiées par catégorie avec pagination et filtres
+     * Récupérer les demandes publiées par catégorie avec pagination - PostgreSQL compatible
      */
-    @Query("SELECT d FROM DemandeService d WHERE d.categorieService = :categorie " +
-           "AND d.statut = 'PUBLIEE' " +
-           "AND (:search IS NULL OR d.titre LIKE CONCAT('%', :search, '%') " +
-           "     OR d.description LIKE CONCAT('%', :search, '%')) " +
-           "AND (:localisation IS NULL OR d.adresseDepart LIKE CONCAT('%', :localisation, '%')) " +
-           "ORDER BY d.dateCreation DESC")
-    Page<DemandeService> findPublishedByCategorieWithFilters(
-        @Param("categorie") ServiceType categorie,
-        @Param("search") String search,
-        @Param("localisation") String localisation,
+    Page<DemandeService> findByCategorieServiceAndStatutOrderByDateCreationDesc(
+        ServiceType categorieService,
+        DemandeService.StatutDemande statut,
         Pageable pageable);
 }

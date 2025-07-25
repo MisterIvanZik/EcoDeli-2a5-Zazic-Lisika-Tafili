@@ -318,27 +318,49 @@ public class PrestataireService {
 
     public Page<DemandeService> getDemandesPaginated(Integer prestataireId, int page, int size,
                                                    String search, String dateMin, String dateMax, String localisation) {
-        Prestataire prestataire = getPrestataireById(prestataireId);
-        
-        if (!isPrestataireValide(prestataireId)) {
-            return Page.empty();
+        try {
+            System.out.println("🔍 SERVICE: Début getDemandesPaginated pour prestataire " + prestataireId);
+            
+            Prestataire prestataire = getPrestataireById(prestataireId);
+            System.out.println("✅ SERVICE: Prestataire trouvé: " + prestataire.getEmail());
+            
+            if (!isPrestataireValide(prestataireId)) {
+                System.out.println("❌ SERVICE: Prestataire non validé");
+                return Page.empty();
+            }
+            System.out.println("✅ SERVICE: Prestataire validé");
+            
+            ServiceType domaineExpertise = prestataire.getDomaineExpertise();
+            if (domaineExpertise == null) {
+                System.out.println("❌ SERVICE: Aucun domaine d'expertise défini");
+                return Page.empty();
+            }
+            System.out.println("✅ SERVICE: Domaine d'expertise: " + domaineExpertise);
+            
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreation"));
+            System.out.println("🔄 SERVICE: Appel repository avec categorie=" + domaineExpertise + ", search=" + search + ", localisation=" + localisation);
+            
+            Page<DemandeService> demandes = demandeServiceRepository.findByCategorieServiceAndStatutOrderByDateCreationDesc(
+                domaineExpertise, DemandeService.StatutDemande.PUBLIEE, pageable);
+            
+            System.out.println("✅ SERVICE: Repository a retourné " + demandes.getContent().size() + " demandes");
+            
+            List<DemandeService> demandesFiltered = demandes.getContent().stream()
+                .filter(demande -> {
+                    boolean dejaCandidature = candidatureRepository.existsByPrestataireAndDemande(prestataireId, demande.getIdDemande());
+                    System.out.println("🔍 SERVICE: Demande " + demande.getIdDemande() + " - Déjà candidaturé: " + dejaCandidature);
+                    return !dejaCandidature;
+                })
+                .collect(Collectors.toList());
+            
+            System.out.println("✅ SERVICE: Après filtrage candidatures: " + demandesFiltered.size() + " demandes");
+            
+            return new org.springframework.data.domain.PageImpl<>(demandesFiltered, pageable, demandesFiltered.size());
+        } catch (Exception e) {
+            System.err.println("❌ ERREUR SERVICE getDemandesPaginated: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        
-        ServiceType domaineExpertise = prestataire.getDomaineExpertise();
-        if (domaineExpertise == null) {
-            return Page.empty();
-        }
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreation"));
-        
-        Page<DemandeService> demandes = demandeServiceRepository.findPublishedByCategorieWithFilters(
-            domaineExpertise, search, localisation, pageable);
-        
-        List<DemandeService> demandesFiltered = demandes.getContent().stream()
-            .filter(demande -> !candidatureRepository.existsByPrestataireAndDemande(prestataireId, demande.getIdDemande()))
-            .collect(Collectors.toList());
-        
-        return new org.springframework.data.domain.PageImpl<>(demandesFiltered, pageable, demandesFiltered.size());
     }
 
 
