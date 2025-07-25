@@ -25,7 +25,7 @@ services:
       
       # Development JPA settings
       JPA_SHOW_SQL: true
-      JPA_HIBERNATE_DDL_AUTO: update
+      JPA_HIBERNATE_DDL_AUTO: create
       
       # Development mail settings (use fake SMTP for testing)
       MAIL_HOST: localhost
