@@ -1,6 +1,5 @@
 package com.ecodeli.ecodeli_backend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -22,7 +21,6 @@ public class ContratCommercant {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_commercant", nullable = false)
-    @JsonIgnore
     private Commercant commercant;
     
     @Enumerated(EnumType.STRING)
@@ -49,7 +47,6 @@ public class ContratCommercant {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_admin_createur")
-    @JsonIgnore
     private Admin adminCreateur;
     
     public enum StatutContrat {
