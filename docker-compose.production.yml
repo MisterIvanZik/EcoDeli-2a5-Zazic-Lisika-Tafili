@@ -71,7 +71,7 @@ services:
       
       # Production JPA settings
       JPA_SHOW_SQL: false
-      JPA_HIBERNATE_DDL_AUTO: create-drop
+      JPA_HIBERNATE_DDL_AUTO: update
       
       # Mail configuration
       MAIL_HOST: ${MAIL_HOST}
